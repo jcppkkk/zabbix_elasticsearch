@@ -1,13 +1,10 @@
 zabbix_export:
-  version: '6.0'
-  date: '2023-01-25T07:28:04Z'
-  groups:
-    -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+  version: '6.4'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
-    -
-      uuid: 42c64c580b2b4d2796764cb0e37dc625
+    - uuid: 42c64c580b2b4d2796764cb0e37dc625
       template: 'Elasticsearch Cluster by Zabbix agent'
       name: 'Elasticsearch Cluster by Zabbix agent'
       description: |
@@ -23,11 +20,9 @@ zabbix_export:
         
         Template tooling version used: 0.41
       groups:
-        -
-          name: Templates/Applications
+        - name: Templates/Applications
       items:
-        -
-          uuid: 2aab94f882754d48897ef87c16cb0b0c
+        - uuid: 2aab94f882754d48897ef87c16cb0b0c
           name: 'ES: Delayed unassigned shards'
           type: DEPENDENT
           key: es.cluster.delayed_unassigned_shards
@@ -35,18 +30,15 @@ zabbix_export:
           history: 7d
           description: 'The number of shards whose allocation has been delayed by the timeout settings.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.delayed_unassigned_shards
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: shards
-        -
-          uuid: a792076c155d40f48acecd662b097dec
+        - uuid: a792076c155d40f48acecd662b097dec
           name: 'ES: Inactive shards percentage'
           type: DEPENDENT
           key: es.cluster.inactive_shards_percent_as_number
@@ -56,22 +48,18 @@ zabbix_export:
           units: '%'
           description: 'The ratio of inactive shards in the cluster expressed as a percentage.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.active_shards_percent_as_number
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - 'return (100 - value)'
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: shards
-        -
-          uuid: 6ce68a3c624749c79f8f5a2f675a1e03
+        - uuid: 6ce68a3c624749c79f8f5a2f675a1e03
           name: 'ES: Number of initializing shards'
           type: DEPENDENT
           key: es.cluster.initializing_shards
@@ -79,29 +67,24 @@ zabbix_export:
           history: 7d
           description: 'The number of shards that are under initialization.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.initializing_shards
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: shards
           triggers:
-            -
-              uuid: b3691b43b9a542619cfbe5916fa29851
+            - uuid: b3691b43b9a542619cfbe5916fa29851
               expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.cluster.initializing_shards,10m)>0'
               name: 'ES: Cluster has the initializing shards'
               priority: AVERAGE
               description: 'The cluster has the initializing shards longer than 10 minutes.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: ca49ebc8b4fe4094a68527eaa117409e
+        - uuid: ca49ebc8b4fe4094a68527eaa117409e
           name: 'ES: Number of data nodes'
           type: DEPENDENT
           key: es.cluster.number_of_data_nodes
@@ -109,22 +92,18 @@ zabbix_export:
           history: 7d
           description: 'The number of nodes that are dedicated to data nodes.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.number_of_data_nodes
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: nodes
-        -
-          uuid: 3483014abea5428482f08c69e00ef2d1
+        - uuid: 3483014abea5428482f08c69e00ef2d1
           name: 'ES: Number of nodes'
           type: DEPENDENT
           key: es.cluster.number_of_nodes
@@ -132,43 +111,35 @@ zabbix_export:
           history: 7d
           description: 'The number of nodes within the cluster.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.number_of_nodes
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: nodes
           triggers:
-            -
-              uuid: 2973bca7b7d942219d38afac5cba39be
+            - uuid: 2973bca7b7d942219d38afac5cba39be
               expression: 'change(/Elasticsearch Cluster by Zabbix agent/es.cluster.number_of_nodes)<0'
               name: 'ES: The number of nodes within the cluster has decreased'
               priority: INFO
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-            -
-              uuid: 53fe76680be84a5cafebac45230b0463
+            - uuid: 53fe76680be84a5cafebac45230b0463
               expression: 'change(/Elasticsearch Cluster by Zabbix agent/es.cluster.number_of_nodes)>0'
               name: 'ES: The number of nodes within the cluster has increased'
               priority: INFO
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: 49966889c36b4afd97f41c40a4c4a2d3
+        - uuid: 49966889c36b4afd97f41c40a4c4a2d3
           name: 'ES: Number of pending tasks'
           type: DEPENDENT
           key: es.cluster.number_of_pending_tasks
@@ -176,18 +147,15 @@ zabbix_export:
           history: 7d
           description: 'The number of cluster-level changes that have not yet been executed.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.number_of_pending_tasks
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: tasks
-        -
-          uuid: 0a9e06b7cd19460ebe2d95251d0c36f0
+        - uuid: 0a9e06b7cd19460ebe2d95251d0c36f0
           name: 'ES: Number of relocating shards'
           type: DEPENDENT
           key: es.cluster.relocating_shards
@@ -195,18 +163,15 @@ zabbix_export:
           history: 7d
           description: 'The number of shards that are under relocation.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.relocating_shards
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: shards
-        -
-          uuid: 2295b43b936b4f4189da0f1851a66ba7
+        - uuid: 2295b43b936b4f4189da0f1851a66ba7
           name: 'ES: Cluster health status'
           type: DEPENDENT
           key: es.cluster.status
@@ -220,33 +185,26 @@ zabbix_export:
             All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.
             red
             One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.
-          valuemap:
-            name: 'ES cluster state'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.status
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   var state = ['green', 'yellow', 'red'];
                   
                   return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
           triggers:
-            -
-              uuid: 22e66cb40ad84ce78dc6888ce147760f
+            - uuid: 22e66cb40ad84ce78dc6888ce147760f
               expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.cluster.status)=2'
               name: 'ES: Health is RED'
               priority: HIGH
@@ -254,21 +212,17 @@ zabbix_export:
                 One or more primary shards are unassigned, so some data is unavailable.
                 This can occur briefly during cluster startup as primary shards are assigned.
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-            -
-              uuid: 55db07f1a61e4f26828a41ce8f6d39e5
+            - uuid: 55db07f1a61e4f26828a41ce8f6d39e5
               expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.cluster.status)=255'
               name: 'ES: Health is UNKNOWN'
               priority: HIGH
               description: 'The health status of the cluster is unknown or cannot be obtained.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-            -
-              uuid: 68f7500ea9da42d795b166637d1b1e97
+            - uuid: 68f7500ea9da42d795b166637d1b1e97
               expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.cluster.status)=1'
               name: 'ES: Health is YELLOW'
               priority: AVERAGE
@@ -276,11 +230,9 @@ zabbix_export:
                 All primary shards are assigned, but one or more replica shards are unassigned.
                 If a node in the cluster fails, some data could be unavailable until that node is repaired.
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: fa3d0bb414cd42fbb31d13bdd38aca45
+        - uuid: fa3d0bb414cd42fbb31d13bdd38aca45
           name: 'ES: Task max waiting in queue'
           type: DEPENDENT
           key: es.cluster.task_max_waiting_in_queue
@@ -290,22 +242,18 @@ zabbix_export:
           units: s
           description: 'The time expressed in seconds since the earliest initiated task is waiting for being performed.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.task_max_waiting_in_queue_millis
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.001'
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: tasks
-        -
-          uuid: 5c7044d16b894545962e6f70d72a6f37
+        - uuid: 5c7044d16b894545962e6f70d72a6f37
           name: 'ES: Number of unassigned shards'
           type: DEPENDENT
           key: es.cluster.unassigned_shards
@@ -313,29 +261,24 @@ zabbix_export:
           history: 7d
           description: 'The number of shards that are not allocated.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.unassigned_shards
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: shards
           triggers:
-            -
-              uuid: 1dc3bd9cf6564b2fb7c11812e60fafe7
+            - uuid: 1dc3bd9cf6564b2fb7c11812e60fafe7
               expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.cluster.unassigned_shards,10m)>0'
               name: 'ES: Cluster has the unassigned shards'
               priority: AVERAGE
               description: 'The cluster has the unassigned shards longer than 10 minutes.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: 1af99c7bd9834bd0a949d3671cb06a59
+        - uuid: 1af99c7bd9834bd0a949d3671cb06a59
           name: 'ES: Cluster name'
           type: DEPENDENT
           key: 'es.cluster_name[{#ES.NODE}]'
@@ -345,8 +288,7 @@ zabbix_export:
           description: 'Name of the cluster this node belongs to.'
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
-        -
-          uuid: 6fd4acab4d754cf4b0326292ae88284a
+        - uuid: 6fd4acab4d754cf4b0326292ae88284a
           name: 'ES: Indices with shards assigned to nodes'
           type: DEPENDENT
           key: es.indices.count
@@ -354,22 +296,18 @@ zabbix_export:
           history: 7d
           description: 'The total number of indices with shards assigned to the selected nodes.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.indices.count
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: indices
-        -
-          uuid: c47c4ac2329240dba90bf32e38d5f076
+        - uuid: c47c4ac2329240dba90bf32e38d5f076
           name: 'ES: Number of non-deleted documents'
           type: DEPENDENT
           key: es.indices.docs.count
@@ -379,22 +317,18 @@ zabbix_export:
             The total number of non-deleted documents across all primary shards assigned to the selected nodes.
             This number is based on the documents in Lucene segments and may include the documents from nested fields.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.indices.docs.count
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: documents
-        -
-          uuid: 8bf2c4eb692742149ba3e5c653a39d34
+        - uuid: 8bf2c4eb692742149ba3e5c653a39d34
           name: 'ES: Nodes with the data role'
           type: DEPENDENT
           key: es.nodes.count.data
@@ -402,22 +336,18 @@ zabbix_export:
           history: 7d
           description: 'The number of selected nodes with the data role.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.nodes.count.data
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: nodes
-        -
-          uuid: 1bd873a15d63467ba26bbce2f5010cb1
+        - uuid: 1bd873a15d63467ba26bbce2f5010cb1
           name: 'ES: Nodes with the ingest role'
           type: DEPENDENT
           key: es.nodes.count.ingest
@@ -425,22 +355,18 @@ zabbix_export:
           history: 7d
           description: 'The number of selected nodes with the ingest role.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.nodes.count.ingest
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: nodes
-        -
-          uuid: 984bbf0d87064463a437d34cdd06b069
+        - uuid: 984bbf0d87064463a437d34cdd06b069
           name: 'ES: Nodes with the master role'
           type: DEPENDENT
           key: es.nodes.count.master
@@ -448,33 +374,27 @@ zabbix_export:
           history: 7d
           description: 'The number of selected nodes with the master role.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.nodes.count.master
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: nodes
           triggers:
-            -
-              uuid: 437a184063e44206afb3724eacd3de9f
+            - uuid: 437a184063e44206afb3724eacd3de9f
               expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.nodes.count.master)=2'
               name: 'ES: Cluster has only two master nodes'
               priority: DISASTER
               description: 'The cluster has only two nodes with a master role and will be unavailable if one of them breaks.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: b123603d7b414e95b16dd978a46fb053
+        - uuid: b123603d7b414e95b16dd978a46fb053
           name: 'ES: Total available size to JVM in all file stores'
           type: DEPENDENT
           key: es.nodes.fs.available_in_bytes
@@ -486,22 +406,18 @@ zabbix_export:
             Depending on OS or process-level restrictions, this number may be less than nodes.fs.free_in_byes.
             This is the actual amount of free disk space the selected Elasticsearch nodes can use.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.nodes.fs.available_in_bytes
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: 1018b84f18bc4467a9b3a44c46b1a16b
+        - uuid: 1018b84f18bc4467a9b3a44c46b1a16b
           name: 'ES: Total size of all file stores'
           type: DEPENDENT
           key: es.nodes.fs.total_in_bytes
@@ -510,22 +426,18 @@ zabbix_export:
           units: B
           description: 'The total size in bytes of all file stores across all selected nodes.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.nodes.fs.total_in_bytes
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: d952968c874a4b73a18444e33e2f9171
+        - uuid: d952968c874a4b73a18444e33e2f9171
           name: 'ES: Cluster uptime'
           type: DEPENDENT
           key: es.nodes.jvm.max_uptime
@@ -535,23 +447,19 @@ zabbix_export:
           units: s
           description: 'Uptime duration in seconds since JVM has last started.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.nodes.jvm.max_uptime_in_millis
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.001'
           master_item:
             key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
           triggers:
-            -
-              uuid: 28b56af1e1fa4537b88a0b54f53964d8
+            - uuid: 28b56af1e1fa4537b88a0b54f53964d8
               expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.nodes.jvm.max_uptime)<10m'
               name: 'ES: Cluster has been restarted'
               event_name: 'ES: Cluster has been restarted (uptime < 10m)'
@@ -559,11 +467,9 @@ zabbix_export:
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: d4cf5c8a6eb84e538a0b3ecbe905eb58
+        - uuid: d4cf5c8a6eb84e538a0b3ecbe905eb58
           name: 'ES: Service response time'
           key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
           history: 7d
@@ -571,12 +477,10 @@ zabbix_export:
           units: s
           description: 'Checks performance of the TCP service.'
           tags:
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: 07549e866e5b4fc6943e600ca53c7d23
+            - uuid: 07549e866e5b4fc6943e600ca53c7d23
               expression: 'min(/Elasticsearch Cluster by Zabbix agent/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
               name: 'ES: Service response time is too high'
               event_name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
@@ -584,15 +488,12 @@ zabbix_export:
               description: 'The performance of the TCP service is very low.'
               manual_close: 'YES'
               dependencies:
-                -
-                  name: 'ES: Service is down'
+                - name: 'ES: Service is down'
                   expression: 'last(/Elasticsearch Cluster by Zabbix agent/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-        -
-          uuid: a181a6ad4a814cec95367ab5041cd042
+        - uuid: a181a6ad4a814cec95367ab5041cd042
           name: 'ES: Service status'
           key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
           history: 7d
@@ -600,31 +501,37 @@ zabbix_export:
           valuemap:
             name: 'Service state'
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 10m
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: 624e9a3930844e0085d6df664eb5b268
+            - uuid: 624e9a3930844e0085d6df664eb5b268
               expression: 'last(/Elasticsearch Cluster by Zabbix agent/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0'
               name: 'ES: Service is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept TCP connections.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: ead17b0d0cd049e28ad27891cea81498
+        - uuid: 9abd9f0f7b1c4d5ba857e753ab67ac93
+          name: 'ES: Get index settings'
+          key: 'web.page.get[{$ELASTICSEARCH.HOST},"_settings/index.provided_name,index.blocks.*",{$ELASTICSEARCH.PORT}]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns index settings.'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\n\s?\n(.*)'
+                - \1
+        - uuid: ead17b0d0cd049e28ad27891cea81498
           name: 'ES: Get cluster health'
           key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/health?timeout=5s,{$ELASTICSEARCH.PORT}]'
           history: '0'
@@ -632,17 +539,14 @@ zabbix_export:
           value_type: TEXT
           description: 'Returns the health status of a cluster.'
           preprocessing:
-            -
-              type: REGEX
+            - type: REGEX
               parameters:
                 - '\n\s?\n(.*)'
                 - \1
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
-        -
-          uuid: 970b8f0b0515425a881281d3edc2ccb4
+        - uuid: 970b8f0b0515425a881281d3edc2ccb4
           name: 'ES: Get cluster stats'
           key: 'web.page.get[{$ELASTICSEARCH.HOST},_cluster/stats,{$ELASTICSEARCH.PORT}]'
           history: '0'
@@ -650,17 +554,14 @@ zabbix_export:
           value_type: TEXT
           description: 'Returns cluster statistics.'
           preprocessing:
-            -
-              type: REGEX
+            - type: REGEX
               parameters:
                 - '\n\s?\n(.*)'
                 - \1
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
-        -
-          uuid: 91446539cefe442e8644b15f8c52ecd9
+        - uuid: 91446539cefe442e8644b15f8c52ecd9
           name: 'ES: Get nodes stats'
           key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
           history: '0'
@@ -668,94 +569,106 @@ zabbix_export:
           value_type: TEXT
           description: 'Returns cluster nodes statistics.'
           preprocessing:
-            -
-              type: REGEX
+            - type: REGEX
               parameters:
                 - '\n\s?\n(.*)'
                 - \1
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
-        -
-          uuid: 9abd9f0f7b1c4d5ba857e753ab67ac93
-          name: 'ES: Get index settings'
-          key: 'web.page.get[{$ELASTICSEARCH.HOST},_settings,{$ELASTICSEARCH.PORT}]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'Returns index settings.'
       discovery_rules:
-        -
-          uuid: 2e275df90c7043ddae169d702a7777be
+        - uuid: 2e275df90c7043ddae169d702a7777be
           name: 'Index settings discovery'
           type: DEPENDENT
           key: es.index.settings
           delay: '0'
           description: 'Discovery ES index settings'
           item_prototypes:
-            -
-              uuid: 006417a616874aec90bb76dd4c54606f
-              name: 'ES {#ES.INDEX_NAME}: read_only_allow_delete'
+            - uuid: 43169e6b233d4148a9236240f7d19531
+              name: 'ES {#ES.INDEX_NAME}: blocks.write'
+              type: DEPENDENT
+              key: 'es.index.blocks_write[{#ES.INDEX_NAME}]'
+              delay: '0'
+              description: 'Elasticsearch index setting to enforces read-only (index.blocks.write)'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$..[''{#ES.INDEX_NAME}''].settings.index.blocks.write.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: 'false'
+                - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'web.page.get[{$ELASTICSEARCH.HOST},"_settings/index.provided_name,index.blocks.*",{$ELASTICSEARCH.PORT}]'
+              tags:
+                - tag: component
+                  value: indices
+              trigger_prototypes:
+                - uuid: 2b40487c3f264dfb908ee2386990b093
+                  expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.index.blocks_write[{#ES.INDEX_NAME}])=1'
+                  name: '"{#ES.INDEX_NAME}": blocks.write = true'
+                  priority: AVERAGE
+                  description: 'The index setting index.blocks.write is set to true when the index and index metadata are read only.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: capacity
+            - uuid: 006417a616874aec90bb76dd4c54606f
+              name: 'ES {#ES.INDEX_NAME}: blocks.read_only_allow_delete'
               type: DEPENDENT
               key: 'es.index.read_only_allow_delete[{#ES.INDEX_NAME}]'
               delay: '0'
               description: 'Elasticsearch enforces a read-only index block (index.blocks.read_only_allow_delete) on every index that has one or more shards allocated on the node that has at least one disk exceeding the flood stage.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[''{#ES.INDEX_NAME}''].settings.index.blocks.read_only_allow_delete.first()'
-                  error_handler: DISCARD_VALUE
-                -
-                  type: BOOL_TO_DECIMAL
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: 'false'
+                - type: BOOL_TO_DECIMAL
                   parameters:
                     - ''
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'web.page.get[{$ELASTICSEARCH.HOST},_settings,{$ELASTICSEARCH.PORT}]'
+                key: 'web.page.get[{$ELASTICSEARCH.HOST},"_settings/index.provided_name,index.blocks.*",{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: indices
-                -
-                  tag: index
-                  value: '{#ES.INDEX_NAME}'
               trigger_prototypes:
-                -
-                  uuid: 3ce360176805487a860d78f6f8faed61
+                - uuid: 3ce360176805487a860d78f6f8faed61
                   expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.index.read_only_allow_delete[{#ES.INDEX_NAME}])=1'
-                  name: 'Read-only index "{#ES.INDEX_NAME}"'
+                  name: '"{#ES.INDEX_NAME}": blocks.read_only_allow_delete = true'
                   priority: AVERAGE
-                  description: 'The index setting index.read_only_allow_delete is set to true when the index and index metadata are read only. It is set to false when ES allows writes and metadata changes. ES allows deleting the index to free up resources even when this setting is set to true.'
+                  description: |
+                    The index setting index.read_only_allow_delete is set to true when the index and index metadata are read only. It is set to false when ES allows writes and metadata changes. ES allows deleting the index to free up resources even when this setting is set to true.
+                    
+                    settings.blocks.read_only_allow_delete = true
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: capacity
           master_item:
-            key: 'web.page.get[{$ELASTICSEARCH.HOST},_settings,{$ELASTICSEARCH.PORT}]'
+            key: 'web.page.get[{$ELASTICSEARCH.HOST},"_settings/index.provided_name,index.blocks.*",{$ELASTICSEARCH.PORT}]'
           lld_macro_paths:
-            -
-              lld_macro: '{#ES.INDEX_NAME}'
+            - lld_macro: '{#ES.INDEX_NAME}'
               path: $..provided_name.first()
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[*]'
-        -
-          uuid: 6f2cb825a6294010be54883fb6f467ee
+        - uuid: 6f2cb825a6294010be54883fb6f467ee
           name: 'Cluster nodes discovery'
           key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/_all/nodes,{$ELASTICSEARCH.PORT}]'
           delay: 1h
           description: 'Discovery ES cluster nodes.'
           item_prototypes:
-            -
-              uuid: fcc73ca3da1d4911a076a63f6cdc4c1d
+            - uuid: fcc73ca3da1d4911a076a63f6cdc4c1d
               name: 'ES {#ES.NODE}: Total available size'
               type: DEPENDENT
               key: 'es.node.fs.total.available_in_bytes[{#ES.NODE}]'
@@ -767,25 +680,20 @@ zabbix_export:
                 Depending on OS or process level restrictions, this might appear less than fs.total.free_in_bytes.
                 This is the actual amount of free disk space the Elasticsearch node can utilize.
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].fs.total.available_in_bytes.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 9fef949dcd8743bdb44f7c61396681ce
+            - uuid: 9fef949dcd8743bdb44f7c61396681ce
               name: 'ES {#ES.NODE}: Total size'
               type: DEPENDENT
               key: 'es.node.fs.total.total_in_bytes[{#ES.NODE}]'
@@ -794,25 +702,20 @@ zabbix_export:
               units: B
               description: 'Total size (in bytes) of all file stores.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].fs.total.total_in_bytes.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 5dd6a2bfd5ae42e0862883c39e3f023f
+            - uuid: 5dd6a2bfd5ae42e0862883c39e3f023f
               name: 'ES {#ES.NODE}: Number of open HTTP connections'
               type: DEPENDENT
               key: 'es.node.http.current_open[{#ES.NODE}]'
@@ -820,25 +723,20 @@ zabbix_export:
               history: 7d
               description: 'The number of currently open HTTP connections for the node.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].http.current_open.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: connections
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 2223308095f4432b8e2a4c88b347256c
+            - uuid: 2223308095f4432b8e2a4c88b347256c
               name: 'ES {#ES.NODE}: Rate of HTTP connections opened'
               type: DEPENDENT
               key: 'es.node.http.opened.rate[{#ES.NODE}]'
@@ -848,25 +746,20 @@ zabbix_export:
               units: rps
               description: 'The number of HTTP connections opened for the node per second.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].http.total_opened.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: connections
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 74d4cd768fb6470f868d4edb21a34a46
+            - uuid: 74d4cd768fb6470f868d4edb21a34a46
               name: 'ES {#ES.NODE}: Flush latency'
               type: CALCULATED
               key: 'es.node.indices.flush.latency[{#ES.NODE}]'
@@ -876,15 +769,12 @@ zabbix_export:
               params: 'change(//es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.flush.total[{#ES.NODE}]) + (change(//es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
               description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 71457e898a084697a3c06e43ab242d75
+                - uuid: 71457e898a084697a3c06e43ab242d75
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.indices.flush.latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Flush latency is too high'
                   event_name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
@@ -893,11 +783,9 @@ zabbix_export:
                     If you see this metric increasing steadily, it may indicate a problem with slow disks; this problem may escalate
                     and eventually prevent you from being able to add new information to your index.
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: dded05fd59474d36acab27b14d5a7c60
+            - uuid: dded05fd59474d36acab27b14d5a7c60
               name: 'ES {#ES.NODE}: Total number of index flushes to disk'
               type: DEPENDENT
               key: 'es.node.indices.flush.total[{#ES.NODE}]'
@@ -905,25 +793,20 @@ zabbix_export:
               history: 7d
               description: 'The total number of flush operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.flush.total.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: ee9420ce15294c819622e55301852a50
+            - uuid: ee9420ce15294c819622e55301852a50
               name: 'ES {#ES.NODE}: Total time spent on flushing indices to disk'
               type: DEPENDENT
               key: 'es.node.indices.flush.total_time_in_millis[{#ES.NODE}]'
@@ -932,25 +815,20 @@ zabbix_export:
               units: ms
               description: 'Total time in milliseconds spent performing flush operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.flush.total_time_in_millis.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 4b945fbbe83743919c762dab5907505f
+            - uuid: 4b945fbbe83743919c762dab5907505f
               name: 'ES {#ES.NODE}: Current indexing operations'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_current[{#ES.NODE}]'
@@ -958,25 +836,20 @@ zabbix_export:
               history: 7d
               description: 'The number of indexing operations currently running.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_current.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: e5e8ce35187f4b23a3f2d03e5673bbac
+            - uuid: e5e8ce35187f4b23a3f2d03e5673bbac
               name: 'ES {#ES.NODE}: Indexing latency'
               type: CALCULATED
               key: 'es.node.indices.indexing.index_latency[{#ES.NODE}]'
@@ -986,15 +859,12 @@ zabbix_export:
               params: 'change(//es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
               description: 'The average indexing latency calculated from the available index_total and index_time_in_millis metrics.'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 8ceaa1d4065a47a5849b27a8adb0838f
+                - uuid: 8ceaa1d4065a47a5849b27a8adb0838f
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.indices.indexing.index_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Indexing latency is too high'
                   event_name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
@@ -1003,11 +873,9 @@ zabbix_export:
                     If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch's documentation
                     recommends starting with a bulk indexing size of 5 to 15 megabytes and increasing slowly from there).
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 411c3ca47caf4aeda5e3c27599f9fd4a
+            - uuid: 411c3ca47caf4aeda5e3c27599f9fd4a
               name: 'ES {#ES.NODE}: Total time spent performing indexing'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]'
@@ -1016,25 +884,20 @@ zabbix_export:
               units: ms
               description: 'Total time in milliseconds spent performing indexing operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_time_in_millis.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 014be7c5e927471bac946f7abd402561
+            - uuid: 014be7c5e927471bac946f7abd402561
               name: 'ES {#ES.NODE}: Total number of indexing'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_total[{#ES.NODE}]'
@@ -1042,25 +905,20 @@ zabbix_export:
               history: 7d
               description: 'The total number of indexing operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_total.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 8d7870d20be04c43b2e3a110f0f07e1c
+            - uuid: 8d7870d20be04c43b2e3a110f0f07e1c
               name: 'ES {#ES.NODE}: Time spent throttling operations'
               type: DEPENDENT
               key: 'es.node.indices.indexing.throttle_time[{#ES.NODE}]'
@@ -1070,29 +928,23 @@ zabbix_export:
               units: s
               description: 'Time in seconds spent throttling operations for the last measuring span.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.throttle_time_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: SIMPLE_CHANGE
+                - type: SIMPLE_CHANGE
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 7e4d4b67096145c785cf8b21f73ca39e
+            - uuid: 7e4d4b67096145c785cf8b21f73ca39e
               name: 'ES {#ES.NODE}: Time spent throttling merge operations'
               type: DEPENDENT
               key: 'es.node.indices.merges.total_throttled_time[{#ES.NODE}]'
@@ -1102,29 +954,23 @@ zabbix_export:
               units: s
               description: 'Time in seconds spent throttling merge operations for the last measuring span.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.merges.total_throttled_time_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: SIMPLE_CHANGE
+                - type: SIMPLE_CHANGE
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 68503d3e9058444e890df803e24c4db9
+            - uuid: 68503d3e9058444e890df803e24c4db9
               name: 'ES {#ES.NODE}: Time spent throttling recovery operations'
               type: DEPENDENT
               key: 'es.node.indices.recovery.throttle_time[{#ES.NODE}]'
@@ -1134,29 +980,23 @@ zabbix_export:
               units: s
               description: 'Time in seconds spent throttling recovery operations for the last measuring span.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.recovery.throttle_time_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: SIMPLE_CHANGE
+                - type: SIMPLE_CHANGE
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 558028b368944513a8a395b2359a3d6c
+            - uuid: 558028b368944513a8a395b2359a3d6c
               name: 'ES {#ES.NODE}: Rate of index refreshes'
               type: DEPENDENT
               key: 'es.node.indices.refresh.rate[{#ES.NODE}]'
@@ -1166,25 +1006,20 @@ zabbix_export:
               units: rps
               description: 'The number of refresh operations per second.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.refresh.total.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 86be6ba147d7470eb956cb6d67fa27de
+            - uuid: 86be6ba147d7470eb956cb6d67fa27de
               name: 'ES {#ES.NODE}: Time spent performing refresh'
               type: DEPENDENT
               key: 'es.node.indices.refresh.time[{#ES.NODE}]'
@@ -1194,29 +1029,23 @@ zabbix_export:
               units: s
               description: 'Time in seconds spent performing refresh operations for the last measuring span.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.refresh.total_time_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: SIMPLE_CHANGE
+                - type: SIMPLE_CHANGE
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: operations
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 96afde64f01841cbb1d773cb2ed0cd63
+            - uuid: 96afde64f01841cbb1d773cb2ed0cd63
               name: 'ES {#ES.NODE}: Rate of fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch.rate[{#ES.NODE}]'
@@ -1226,25 +1055,20 @@ zabbix_export:
               units: rps
               description: 'The number of fetch operations per second.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_total.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fetches
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 2aee8e9b69fc4605bef7d92c2d947513
+            - uuid: 2aee8e9b69fc4605bef7d92c2d947513
               name: 'ES {#ES.NODE}: Current fetch operations'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_current[{#ES.NODE}]'
@@ -1252,21 +1076,17 @@ zabbix_export:
               history: 7d
               description: 'The number of fetch operations currently running.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_current.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fetches
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 9495d82c303e4433b7a6a26a6c8cbba5
+            - uuid: 9495d82c303e4433b7a6a26a6c8cbba5
               name: 'ES {#ES.NODE}: Fetch latency'
               type: CALCULATED
               key: 'es.node.indices.search.fetch_latency[{#ES.NODE}]'
@@ -1276,15 +1096,12 @@ zabbix_export:
               params: 'change(//es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
               description: 'The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fetches
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 7e1e624a36f54c18bfce1949d3d9d764
+                - uuid: 7e1e624a36f54c18bfce1949d3d9d764
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.indices.search.fetch_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Fetch latency is too high'
                   event_name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
@@ -1294,11 +1111,9 @@ zabbix_export:
                     this could indicate a problem with slow disks, enriching of documents (highlighting the relevant text in search results, etc.),
                     or requesting too many results.
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: f9fa4dc629f540a283a201fbbb976109
+            - uuid: f9fa4dc629f540a283a201fbbb976109
               name: 'ES {#ES.NODE}: Time spent performing fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_time[{#ES.NODE}]'
@@ -1308,29 +1123,23 @@ zabbix_export:
               units: s
               description: 'Time in seconds spent performing fetch operations for the last measuring span.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_time_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: SIMPLE_CHANGE
+                - type: SIMPLE_CHANGE
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fetches
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 2779372009484effb7bc5f83e683f5af
+            - uuid: 2779372009484effb7bc5f83e683f5af
               name: 'ES {#ES.NODE}: Total time spent performing fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]'
@@ -1339,25 +1148,20 @@ zabbix_export:
               units: ms
               description: 'Time in milliseconds spent performing fetch operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_time_in_millis.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fetches
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: e8e8dab90b7748908567aa24e6cfa8d1
+            - uuid: e8e8dab90b7748908567aa24e6cfa8d1
               name: 'ES {#ES.NODE}: Total number of fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_total[{#ES.NODE}]'
@@ -1365,25 +1169,20 @@ zabbix_export:
               history: 7d
               description: 'The total number of fetch operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_total.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fetches
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 786df57fa38d4d87b11b03365722e246
+            - uuid: 786df57fa38d4d87b11b03365722e246
               name: 'ES {#ES.NODE}: Rate of queries'
               type: DEPENDENT
               key: 'es.node.indices.search.query.rate[{#ES.NODE}]'
@@ -1393,25 +1192,20 @@ zabbix_export:
               units: rps
               description: 'The number of query operations per second.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_total.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: queries
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 7b202bd1bb72452babfd65b06668c53c
+            - uuid: 7b202bd1bb72452babfd65b06668c53c
               name: 'ES {#ES.NODE}: Current query operations'
               type: DEPENDENT
               key: 'es.node.indices.search.query_current[{#ES.NODE}]'
@@ -1419,21 +1213,17 @@ zabbix_export:
               history: 7d
               description: 'The number of query operations currently running.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_current.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: queries
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 3e4ef2f5f05047e8a0a51d9c6e71dac2
+            - uuid: 3e4ef2f5f05047e8a0a51d9c6e71dac2
               name: 'ES {#ES.NODE}: Query latency'
               type: CALCULATED
               key: 'es.node.indices.search.query_latency[{#ES.NODE}]'
@@ -1445,26 +1235,21 @@ zabbix_export:
                 ( change(//es.node.indices.search.query_total[{#ES.NODE}]) + (change(//es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
               description: 'The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: queries
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 41de42b51a004001bd7041d090e8104f
+                - uuid: 41de42b51a004001bd7041d090e8104f
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.indices.search.query_latency[{#ES.NODE}],5m)>{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Query latency is too high'
                   event_name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: 'If latency exceeds a threshold, look for potential resource bottlenecks, or investigate whether you need to optimize your queries.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 1c11aa719f0946c39aa6c4ee907f9a59
+            - uuid: 1c11aa719f0946c39aa6c4ee907f9a59
               name: 'ES {#ES.NODE}: Time spent performing query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_time[{#ES.NODE}]'
@@ -1474,29 +1259,23 @@ zabbix_export:
               units: s
               description: 'Time in seconds spent performing query operations for the last measuring span.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_time_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: SIMPLE_CHANGE
+                - type: SIMPLE_CHANGE
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: queries
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 466188d29bb2489785615fb6ba7bff99
+            - uuid: 466188d29bb2489785615fb6ba7bff99
               name: 'ES {#ES.NODE}: Total time spent performing query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_time_in_millis[{#ES.NODE}]'
@@ -1505,25 +1284,20 @@ zabbix_export:
               units: ms
               description: 'Time in milliseconds spent performing query operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_time_in_millis.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: queries
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 33393e1b2e9c411b97c782d65dcffbc9
+            - uuid: 33393e1b2e9c411b97c782d65dcffbc9
               name: 'ES {#ES.NODE}: Total number of query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_total[{#ES.NODE}]'
@@ -1531,25 +1305,20 @@ zabbix_export:
               history: 7d
               description: 'The total number of query operations.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_total.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: queries
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 3993926c9781460fadbed5c15e90aba0
+            - uuid: 3993926c9781460fadbed5c15e90aba0
               name: 'ES {#ES.NODE}: Amount of JVM heap committed'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_committed_in_bytes[{#ES.NODE}]'
@@ -1558,25 +1327,20 @@ zabbix_export:
               units: B
               description: 'The amount of memory, in bytes, available for use by the heap.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_committed_in_bytes.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: memory
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 00ca43e74e3242dfa3ad87a9477ec119
+            - uuid: 00ca43e74e3242dfa3ad87a9477ec119
               name: 'ES {#ES.NODE}: Maximum JVM memory available for use'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_max_in_bytes[{#ES.NODE}]'
@@ -1585,25 +1349,20 @@ zabbix_export:
               units: B
               description: 'The maximum amount of memory, in bytes, available for use by the heap.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_max_in_bytes.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: memory
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 0363665efaff4265aa20bf7269963a2d
+            - uuid: 0363665efaff4265aa20bf7269963a2d
               name: 'ES {#ES.NODE}: Amount of JVM heap currently in use'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_used_in_bytes[{#ES.NODE}]'
@@ -1612,25 +1371,20 @@ zabbix_export:
               units: B
               description: 'The memory, in bytes, currently in use by the heap.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_used_in_bytes.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: memory
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 8e6b1b5f811349b599d3ff4f335684a8
+            - uuid: 8e6b1b5f811349b599d3ff4f335684a8
               name: 'ES {#ES.NODE}: Percent of JVM heap currently in use'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_used_percent[{#ES.NODE}]'
@@ -1640,26 +1394,21 @@ zabbix_export:
               units: '%'
               description: 'The percentage of memory currently in use by the heap.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_used_percent.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: memory
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: a8a02e3c69004e4fb1762a260fdba9ee
+                - uuid: a8a02e3c69004e4fb1762a260fdba9ee
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical'
                   event_name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
@@ -1669,11 +1418,9 @@ zabbix_export:
                     To address this problem, you can either increase your heap size (as long as it remains below the recommended
                     guidelines stated above), or scale out the cluster by adding more nodes.
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
-                -
-                  uuid: e54d77f633d343f28c6dc698e6a839a0
+                - uuid: e54d77f633d343f28c6dc698e6a839a0
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is high'
                   event_name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
@@ -1683,15 +1430,12 @@ zabbix_export:
                     To address this problem, you can either increase your heap size (as long as it remains below the recommended
                     guidelines stated above), or scale out the cluster by adding more nodes.
                   dependencies:
-                    -
-                      name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical'
+                    - name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical'
                       expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.jvm.mem.heap_used_percent[{#ES.NODE}],1h)>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
-            -
-              uuid: c003135a1c964d77a98b9fb490235053
+            - uuid: c003135a1c964d77a98b9fb490235053
               name: 'ES {#ES.NODE}: Node uptime'
               type: DEPENDENT
               key: 'es.node.jvm.uptime[{#ES.NODE}]'
@@ -1701,26 +1445,21 @@ zabbix_export:
               units: s
               description: 'JVM uptime in seconds.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].jvm.uptime_in_millis.first()'
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: system
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 68c52a76d0d1477bad6976abbae15d2e
+                - uuid: 68c52a76d0d1477bad6976abbae15d2e
                   expression: 'last(/Elasticsearch Cluster by Zabbix agent/es.node.jvm.uptime[{#ES.NODE}])<10m'
                   name: 'ES {#ES.NODE}: has been restarted'
                   event_name: 'ES {#ES.NODE}: has been restarted (uptime < 10m)'
@@ -1728,11 +1467,9 @@ zabbix_export:
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 7a6bc2322923430dbf7e403d48227d64
+            - uuid: 7a6bc2322923430dbf7e403d48227d64
               name: 'ES {#ES.NODE}: Refresh thread pool active threads'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.active[{#ES.NODE}]'
@@ -1740,21 +1477,17 @@ zabbix_export:
               history: 7d
               description: 'The number of active threads in the refresh thread pool.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.active.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: refresh-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: cbbe575d585b472f9fe549b92709ba98
+            - uuid: cbbe575d585b472f9fe549b92709ba98
               name: 'ES {#ES.NODE}: Refresh thread pool executor tasks completed'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]'
@@ -1764,25 +1497,20 @@ zabbix_export:
               units: rps
               description: 'The number of tasks completed by the refresh thread pool executor.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.completed.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: refresh-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 95e3e1b3686149cf9c55ae0d4465a489
+            - uuid: 95e3e1b3686149cf9c55ae0d4465a489
               name: 'ES {#ES.NODE}: Refresh thread pool tasks in queue'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.queue[{#ES.NODE}]'
@@ -1790,21 +1518,17 @@ zabbix_export:
               history: 7d
               description: 'The number of tasks in queue for the refresh thread pool.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.queue.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: refresh-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: a4ac65e10d154b578ad97d599c6d498c
+            - uuid: a4ac65e10d154b578ad97d599c6d498c
               name: 'ES {#ES.NODE}: Refresh thread pool executor tasks rejected'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]'
@@ -1814,37 +1538,30 @@ zabbix_export:
               units: rps
               description: 'The number of tasks rejected by the refresh thread pool executor.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.rejected.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: refresh-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 773e46e503d64241b8c9b92107c7eb86
+                - uuid: 773e46e503d64241b8c9b92107c7eb86
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks'
                   event_name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the refresh thread pool executor is over 0 for 5m.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 175b35a51c4f4bce8fa3b0291e812e0d
+            - uuid: 175b35a51c4f4bce8fa3b0291e812e0d
               name: 'ES {#ES.NODE}: Search thread pool active threads'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.active[{#ES.NODE}]'
@@ -1852,21 +1569,17 @@ zabbix_export:
               history: 7d
               description: 'The number of active threads in the search thread pool.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.active.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: search-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 62dc446b10e740ce91bd8058d33116fe
+            - uuid: 62dc446b10e740ce91bd8058d33116fe
               name: 'ES {#ES.NODE}: Search thread pool executor tasks completed'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.completed.rate[{#ES.NODE}]'
@@ -1876,25 +1589,20 @@ zabbix_export:
               units: rps
               description: 'The number of tasks completed by the search thread pool executor.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.completed.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: search-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 493c917f05fe4442b31cb8f2840cf26b
+            - uuid: 493c917f05fe4442b31cb8f2840cf26b
               name: 'ES {#ES.NODE}: Search thread pool tasks in queue'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.queue[{#ES.NODE}]'
@@ -1902,21 +1610,17 @@ zabbix_export:
               history: 7d
               description: 'The number of tasks in queue for the search thread pool.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.queue.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: search-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 148265cc74b94ea6b5d072e46ca327de
+            - uuid: 148265cc74b94ea6b5d072e46ca327de
               name: 'ES {#ES.NODE}: Search thread pool executor tasks rejected'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.rejected.rate[{#ES.NODE}]'
@@ -1926,37 +1630,30 @@ zabbix_export:
               units: rps
               description: 'The number of tasks rejected by the search thread pool executor.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.rejected.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: search-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: 29af445b33b649aa821b91122cc811a6
+                - uuid: 29af445b33b649aa821b91122cc811a6
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.thread_pool.search.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks'
                   event_name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the search thread pool executor is over 0 for 5m.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 195ad0641526447195a0de77a4f66352
+            - uuid: 195ad0641526447195a0de77a4f66352
               name: 'ES {#ES.NODE}: Write thread pool active threads'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.active[{#ES.NODE}]'
@@ -1964,21 +1661,17 @@ zabbix_export:
               history: 7d
               description: 'The number of active threads in the write thread pool.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.active.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: write-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 1b829614c77944deb2faf376d2f5afcb
+            - uuid: 1b829614c77944deb2faf376d2f5afcb
               name: 'ES {#ES.NODE}: Write thread pool executor tasks completed'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.completed.rate[{#ES.NODE}]'
@@ -1988,25 +1681,20 @@ zabbix_export:
               units: rps
               description: 'The number of tasks completed by the write thread pool executor.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.completed.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: write-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 2c9e62bb6e5c45469dcad7a950b323bb
+            - uuid: 2c9e62bb6e5c45469dcad7a950b323bb
               name: 'ES {#ES.NODE}: Write thread pool tasks in queue'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.queue[{#ES.NODE}]'
@@ -2014,21 +1702,17 @@ zabbix_export:
               history: 7d
               description: 'The number of tasks in queue for the write thread pool.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.queue.first()'
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: write-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
-            -
-              uuid: 654581bf3e3a4d29930a2e9ed63bee80
+            - uuid: 654581bf3e3a4d29930a2e9ed63bee80
               name: 'ES {#ES.NODE}: Write thread pool executor tasks rejected'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
@@ -2038,311 +1722,246 @@ zabbix_export:
               units: rps
               description: 'The number of tasks rejected by the write thread pool executor.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.rejected.first()'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'web.page.get[{$ELASTICSEARCH.HOST},_nodes/stats,{$ELASTICSEARCH.PORT}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: write-thread-pool
-                -
-                  tag: node
+                - tag: node
                   value: '{#ES.NODE}'
               trigger_prototypes:
-                -
-                  uuid: d572723e1e044b6585754ecced717f19
+                - uuid: d572723e1e044b6585754ecced717f19
                   expression: 'min(/Elasticsearch Cluster by Zabbix agent/es.node.thread_pool.write.rejected.rate[{#ES.NODE}],5m)>0'
                   name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks'
                   event_name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
                   priority: WARNING
                   description: 'The number of tasks rejected by the write thread pool executor is over 0 for 5m.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
           graph_prototypes:
-            -
-              uuid: f7126fbfdf67453cbc23daaeb4d5ddd8
+            - uuid: f7126fbfdf67453cbc23daaeb4d5ddd8
               name: 'ES {#ES.NODE}: Latency'
               graph_items:
-                -
-                  color: 1A7C11
+                - color: 1A7C11
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.indices.search.query_latency[{#ES.NODE}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.indices.indexing.index_latency[{#ES.NODE}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: F63100
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.indices.search.fetch_latency[{#ES.NODE}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: A54F10
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.indices.flush.latency[{#ES.NODE}]'
-            -
-              uuid: c37798613d5b4b20b19d498f67a6b826
+            - uuid: c37798613d5b4b20b19d498f67a6b826
               name: 'ES {#ES.NODE}: Query load'
               graph_items:
-                -
-                  color: 1A7C11
+                - color: 1A7C11
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.indices.search.fetch_current[{#ES.NODE}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.indices.search.query_current[{#ES.NODE}]'
-            -
-              uuid: 913f49c6601b4ea7a34a8ba279bd1aa7
+            - uuid: 913f49c6601b4ea7a34a8ba279bd1aa7
               name: 'ES {#ES.NODE}: Refresh thread pool'
               graph_items:
-                -
-                  color: 1A7C11
+                - color: 1A7C11
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.refresh.active[{#ES.NODE}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.refresh.queue[{#ES.NODE}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: F63100
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: A54F10
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]'
-            -
-              uuid: 60fa7e23b5854c8d82cf58d6cd08558b
+            - uuid: 60fa7e23b5854c8d82cf58d6cd08558b
               name: 'ES {#ES.NODE}: Search thread pool'
               graph_items:
-                -
-                  color: 1A7C11
+                - color: 1A7C11
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.search.active[{#ES.NODE}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.search.queue[{#ES.NODE}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: F63100
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.search.completed.rate[{#ES.NODE}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: A54F10
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.search.rejected.rate[{#ES.NODE}]'
-            -
-              uuid: 92bc45017d7d46c7a88ce76bb80833a3
+            - uuid: 92bc45017d7d46c7a88ce76bb80833a3
               name: 'ES {#ES.NODE}: Write thread pool'
               graph_items:
-                -
-                  color: 1A7C11
+                - color: 1A7C11
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.write.active[{#ES.NODE}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.write.queue[{#ES.NODE}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: F63100
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.write.completed.rate[{#ES.NODE}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: A54F10
                   item:
                     host: 'Elasticsearch Cluster by Zabbix agent'
                     key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
           lld_macro_paths:
-            -
-              lld_macro: '{#ES.NODE}'
+            - lld_macro: '{#ES.NODE}'
               path: $..name.first()
           preprocessing:
-            -
-              type: REGEX
+            - type: REGEX
               parameters:
                 - '\n\s?\n(.*)'
                 - \1
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.nodes.[*]'
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
       tags:
-        -
-          tag: class
+        - tag: class
           value: software
-        -
-          tag: target
+        - tag: target
           value: elasticsearch
       macros:
-        -
-          macro: '{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
+        - macro: '{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
           value: '100'
           description: 'Maximum of fetch latency in milliseconds for trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
+        - macro: '{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
           value: '100'
           description: 'Maximum of flush latency in milliseconds for trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+        - macro: '{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
           value: '95'
           description: 'The maximum percent in the use of JVM heap for critically trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
+        - macro: '{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
           value: '85'
           description: 'The maximum percent in the use of JVM heap for warning trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.HOST}'
+        - macro: '{$ELASTICSEARCH.HOST}'
           value: localhost
           description: 'The hostname of the Elasticsearch host.'
-        -
-          macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
+        - macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
           value: '100'
           description: 'Maximum of indexing latency in milliseconds for trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.PASSWORD}'
+        - macro: '{$ELASTICSEARCH.PASSWORD}'
           description: 'The password of the Elasticsearch.'
-        -
-          macro: '{$ELASTICSEARCH.PORT}'
+        - macro: '{$ELASTICSEARCH.PORT}'
           value: '9200'
           description: 'The port of the Elasticsearch host.'
-        -
-          macro: '{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
+        - macro: '{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
           value: '100'
           description: 'Maximum of query latency in milliseconds for trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
+        - macro: '{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
           value: 10s
           description: 'The ES cluster maximum response time in seconds for trigger expression.'
-        -
-          macro: '{$ELASTICSEARCH.SCHEME}'
+        - macro: '{$ELASTICSEARCH.SCHEME}'
           value: http
           description: 'The scheme of the Elasticsearch (http/https).'
-        -
-          macro: '{$ELASTICSEARCH.USERNAME}'
+        - macro: '{$ELASTICSEARCH.USERNAME}'
           description: 'The username of the Elasticsearch.'
       valuemaps:
-        -
-          uuid: c9035f06a9364a18be3dac34142b5162
+        - uuid: c9035f06a9364a18be3dac34142b5162
           name: 'ES cluster state'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: green
-            -
-              value: '1'
+            - value: '1'
               newvalue: yellow
-            -
-              value: '2'
+            - value: '2'
               newvalue: red
-            -
-              value: '255'
+            - value: '255'
               newvalue: unknown
-        -
-          uuid: b8e87a59c7694c77a050c67965ddf5f5
+        - uuid: b8e87a59c7694c77a050c67965ddf5f5
           name: 'Service state'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: Down
-            -
-              value: '1'
+            - value: '1'
               newvalue: Up
   triggers:
-    -
-      uuid: 368301e997804553bbda34066f5a7efc
+    - uuid: 368301e997804553bbda34066f5a7efc
       expression: '(last(/Elasticsearch Cluster by Zabbix agent/es.nodes.fs.total_in_bytes)-last(/Elasticsearch Cluster by Zabbix agent/es.nodes.fs.available_in_bytes))/(last(/Elasticsearch Cluster by Zabbix agent/es.cluster.number_of_data_nodes)-1)>last(/Elasticsearch Cluster by Zabbix agent/es.nodes.fs.available_in_bytes)'
       name: 'ES: Cluster does not have enough space for resharding'
       priority: HIGH
       description: 'There is not enough disk space for index resharding.'
       tags:
-        -
-          tag: scope
+        - tag: scope
           value: capacity
   graphs:
-    -
-      uuid: 2f9137e454974e44a3c9136dedfeedd4
+    - uuid: 2f9137e454974e44a3c9136dedfeedd4
       name: 'ES: Cluster health'
       graph_items:
-        -
-          color: 1A7C11
+        - color: 1A7C11
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
             key: es.cluster.inactive_shards_percent_as_number
-        -
-          sortorder: '1'
+        - sortorder: '1'
           color: 2774A4
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
             key: es.cluster.relocating_shards
-        -
-          sortorder: '2'
+        - sortorder: '2'
           color: F63100
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
             key: es.cluster.initializing_shards
-        -
-          sortorder: '3'
+        - sortorder: '3'
           color: A54F10
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
             key: es.cluster.unassigned_shards
-        -
-          sortorder: '4'
+        - sortorder: '4'
           color: FC6EA3
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
             key: es.cluster.delayed_unassigned_shards
-        -
-          sortorder: '5'
+        - sortorder: '5'
           color: 6C59DC
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
             key: es.cluster.number_of_pending_tasks
-        -
-          sortorder: '6'
+        - sortorder: '6'
           color: AC8C14
           item:
             host: 'Elasticsearch Cluster by Zabbix agent'
